@@ -1,5 +1,4 @@
 package com.example.pdfcomparator.service;
-
 import com.example.pdfcomparator.util.CsvReportExporter;
 import com.example.pdfcomparator.util.ExclusionHelper;
 import de.redsix.pdfcompare.CompareResult;
@@ -13,7 +12,6 @@ import org.apache.pdfbox.text.TextPosition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
