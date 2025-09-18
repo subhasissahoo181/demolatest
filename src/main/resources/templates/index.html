@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>PDF Comparator</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+        }
+
+        input[type="file"], input[type="number"] {
+            margin: 10px 0;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .download-btn {
+            margin-top: 20px;
+            display: inline-block;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .download-btn:hover {
+            background-color: #218838;
+        }
+
+        .hidden {
+            display: none;
+        }
+        pre{
+            overflow-x: scroll;
+        }
+    </style>
+    <script>
+        function showExcludeFields(inputId, sectionId) {
+            const input = document.getElementById(inputId);
+            const section = document.getElementById(sectionId);
+            if (input.files.length > 0) {
+                section.classList.remove("hidden");
+            } else {
+                section.classList.add("hidden");
+            }
+        }
+
+        function addPageField(containerId) {
+            const container = document.getElementById(containerId);
+            const input = document.createElement("input");
+            input.type = "number";
+            input.name = containerId;
+            input.placeholder = "Page number";
+            container.appendChild(input);
+        }
+
+        function removePageField(containerId) {
+            const container = document.getElementById(containerId);
+            if (container.children.length > 1) {
+                container.removeChild(container.lastChild);
+            }
+        }
+
+        function prepareExclusionsJson() {
+            const pages1 = Array.from(document.getElementsByName("excludePages1"))
+                .map(input => input.value)
+                .filter(val => val !== "")
+                .map(val => ({ page: parseInt(val) }));
+
+            const pages2 = Array.from(document.getElementsByName("excludePages2"))
+                .map(input => input.value)
+                .filter(val => val !== "")
+                .map(val => ({ page: parseInt(val) }));
+
+            const combined = [...pages1, ...pages2];
+
+            // ✅ Wrap in object with key "exclusions"
+            const json = JSON.stringify({ exclusions: combined });
+
+            const hiddenInput = document.createElement("input");
+            hiddenInput.type = "hidden";
+            hiddenInput.name = "exclusionsJson";
+            hiddenInput.value = json;
+
+            document.querySelector("form").appendChild(hiddenInput);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelector("form").addEventListener("submit", prepareExclusionsJson);
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+    <h2>Upload Two PDFs to Compare</h2>
+    <form method="POST" enctype="multipart/form-data" action="/compare">
+        <input type="file" id="file1" name="file1" required onchange="showExcludeFields('file1', 'excludeSection1')"><br><br>
+      
+
+        <input type="file" id="file2" name="file2" required onchange="showExcludeFields('file2', 'excludeSection2')"><br><br>
+        
+
+        <button type="submit">Compare</button>
+    </form>
+
+    <div th:if="${result}">
+        <h3>Comparison Result:</h3>
+        <pre th:text="${result}"></pre>
+    </div>
+
+    <div th:if="${reportPath}">
+        <a th:href="@{'/downloadReport'(path=${reportPath})}" class="download-btn" download>
+            📄 Download PDF Comparison Report
+        </a>
+    </div>
+
+    <div th:if="${csvPath}">
+        <a th:href="@{'/downloadCsv'(path=${csvPath})}" class="download-btn" download>
+            📊 Download CSV Line-by-Line Report
+        </a>
+    </div>
+</div>
+</body>
+</html>
