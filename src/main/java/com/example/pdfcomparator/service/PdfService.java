@@ -1,6 +1,6 @@
 package com.example.pdfcomparator.service;
 import com.example.pdfcomparator.util.CsvReportExporter;
-import com.example.pdfcomparator.util.ExclusionHelper;
+//import com.example.pdfcomparator.util.ExclusionHelper;
 import de.redsix.pdfcompare.CompareResult;
 import de.redsix.pdfcompare.PdfComparator;
 import org.apache.pdfbox.cos.COSName;
@@ -62,7 +62,7 @@ public class PdfService {
         String outputPath = outputDirPath + "/pdf-comparison-result-" + timestamp;
 
         PdfComparator<?> comparator = new PdfComparator<>(tempFile1, tempFile2);
-        ExclusionHelper.applyExclusions(comparator, exclusionsJson);
+//        ExclusionHelper.applyExclusions(comparator, exclusionsJson);
 
         CompareResult result = comparator.compare();
         result.writeTo(outputPath);
